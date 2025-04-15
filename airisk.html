@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Risk Framework</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        p {
+            color: #555;
+            line-height: 1.5;
+        }
+        /* 테이블 스타일 */
+        table {
+            border-collapse: collapse;
+            margin-top: 10px;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        thead th {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border: 1px solid #3e8e41;
+        }
+        tbody td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tbody tr:hover {
+            background-color: #e6ffe6;
+        }
+        /* 체크박스 그룹 스타일: 각 그룹의 제목과 체크박스는 가로 정렬 */
+        .category-group {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 5px;
+            background-color: #fff;
+            flex: 1;
+            min-width: 150px;
+        }
+        .category-group h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .checkbox-item {
+            font-size: 16px; /* 체크박스 옆 글씨 크게 */
+            margin: 4px;
+            display: block;  /* 한 줄에 하나씩 표시 */
+        }
+        /* 옵션 그룹들을 가로로 배치 */
+        #categoryOptionsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        /* 결과 영역 스타일 */
+        #fullTableContainer, 
+        #filteredTableContainer, 
+        #topColumnsContainer, 
+        #selectedOptionsText {
+            margin-top: 20px;
+        }
+        #topColumnsContainer ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        #topColumnsContainer li {
+            padding: 5px 10px;
+            background-color: #fff;
+            margin: 4px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        /* 상위 3개 위험요소 영역 글씨 크게 */
+        #topColumnsContainer {
+            font-size: 22px;
+        }
+        /* 선택 옵션 텍스트 크게, 처음에는 숨김 */
+        #selectedOptionsText {
+            font-size: 18px;
+            color: #333;
+            background-color: #e7f3ff;
+            padding: 10px;
+            border: 1px solid #b3d4fc;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>AI Risk Framework 엑셀파일을 업로드합니다.</h2>
+    <!-- 파일 업로드 -->
+    <input type="file" id="excelFileInput" accept=".xlsx, .xls" />
+
+    <!-- 전체 데이터 테이블 영역 -->
+    <div id="fullTableContainer">
+        <div id="fullTable"></div>
+    </div>
+
+    <!-- 카테고리별 옵션 선택 영역 -->
+    <div id="filterSection" style="display: none;">
+        <h2>아래 카테고리 별로 옵션을 선택하세요</h2>
+        <div id="categoryOptionsContainer">
+            <!-- 각 카테고리별 옵션 그룹(체크박스)들이 가로로 배치됩니다. -->
+        </div>
+        <br>
+        <button onclick="filterAndDisplay()">필터 적용 및 합계 보기</button>
+    </div>
+
+    <!-- 선택 옵션 텍스트 표시 영역 (처음에는 숨김) -->
+    <div id="selectedOptionsText"></div>
+
+    <!-- 필터링 결과 테이블 영역 -->
+    <div id="filteredTableContainer"></div>
+
+    <!-- 상위 3개 위험요소 영역 -->
+    <div id="topColumnsContainer"></div>
+
+    <!-- SheetJS 라이브러리 (엑셀 파싱용) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script>
+        // 전역 변수: header는 첫 행(헤더), dataRows는 나머지 행들을 저장합니다.
+        let header = [];
+        let dataRows = [];
+        // 고정 카테고리 목록 (A열에 있는 값)
+        const categories = [
+            "적용분야", 
+            "의사결정 지원의 중요도", 
+            "데이터 민감도", 
+            "시스템의 설명가능성", 
+            "의사결정 자동화 수준", 
+            "사용대상", 
+            "기술적 특징"
+        ];
+
+        // 파일 업로드 이벤트: 엑셀 파일을 읽어 최대 38행까지만 반영합니다.
+        document.getElementById('excelFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                // 엑셀 데이터를 배열의 배열 형식으로 읽습니다.
+                let rawData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                if(rawData.length === 0) {
+                    alert("엑셀 파일에 데이터가 없습니다.");
+                    return;
+                }
+                // 최대 38행까지만 반영 (헤더 포함)
+                if (rawData.length > 38) {
+                    rawData = rawData.slice(0, 38);
+                }
+                header = rawData[0];
+                dataRows = rawData.slice(1);
+
+                // A열(인덱스 0)의 병합 셀 효과 적용: 이전 행의 값으로 채움
+                for (let i = 0; i < dataRows.length; i++) {
+                    if (i > 0) {
+                        if ((dataRows[i][0] === undefined || dataRows[i][0] === "") && (dataRows[i - 1][0] !== undefined)) {
+                            dataRows[i][0] = dataRows[i - 1][0];
+                        }
+                    }
+                }
+                
+                // 전체 데이터 테이블 표시
+                displayFullTable(header, dataRows);
+                
+                // 카테고리별 옵션(체크박스) 생성
+                populateCategoryOptions();
+                document.getElementById('filterSection').style.display = 'block';
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // 전체 데이터 테이블을 생성하여 표시하는 함수 (헤더 포함)
+        function displayFullTable(header, rows) {
+            let html = '<table><thead><tr>';
+            header.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            rows.forEach(row => {
+                html += '<tr>';
+                row.forEach(cell => {
+                    html += `<td>${cell !== undefined ? cell : ""}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('fullTable').innerHTML = html;
+        }
+
+        // 카테고리별 옵션 선택(체크박스) UI를 생성하는 함수
+        function populateCategoryOptions() {
+            const container = document.getElementById('categoryOptionsContainer');
+            container.innerHTML = "";
+            // 각 고정 카테고리에 대해
+            categories.forEach(category => {
+                // 해당 카테고리에 해당하는 데이터 (A열 == category)에서 B열의 옵션을 추출
+                const optionsSet = new Set();
+                dataRows.forEach(row => {
+                    if (row[0] === category && row[1] !== undefined && row[1] !== null && row[1] !== "") {
+                        optionsSet.add(row[1]);
+                    }
+                });
+                // 옵션 그룹 DIV 생성
+                let groupDiv = document.createElement('div');
+                groupDiv.className = "category-group";
+                // 카테고리 제목
+                let title = document.createElement('h3');
+                title.textContent = category;
+                groupDiv.appendChild(title);
+                // 체크박스 리스트: 옵션이 있다면 각 항목에 대해 체크박스 생성, 없으면 '옵션 없음' 표시
+                if(optionsSet.size > 0) {
+                    optionsSet.forEach(option => {
+                        let label = document.createElement('label');
+                        label.className = "checkbox-item";
+                        let checkbox = document.createElement('input');
+                        checkbox.type = "checkbox";
+                        checkbox.value = option;
+                        // name 속성을 category로 지정하여 그룹별 선택 수집
+                        checkbox.name = category;
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(" " + option));
+                        groupDiv.appendChild(label);
+                    });
+                } else {
+                    let span = document.createElement('span');
+                    span.textContent = "옵션 없음";
+                    groupDiv.appendChild(span);
+                }
+                container.appendChild(groupDiv);
+            });
+        }
+
+        // 선택된 옵션을 텍스트로 보여주는 함수
+        function displaySelectedOptionsText(selectedOptionsByCategory) {
+            let text = "선택된 옵션: ";
+            let parts = [];
+            // 각 카테고리별로 선택된 항목(없으면 '전체')
+            categories.forEach(cat => {
+                let opts = selectedOptionsByCategory[cat];
+                if(opts && opts.length > 0) {
+                    parts.push(`${cat}: ${opts.join(", ")}`);
+                } else {
+                    parts.push(`${cat}: 전체`);
+                }
+            });
+            text += parts.join(" | ");
+            const selectedTextElem = document.getElementById('selectedOptionsText');
+            selectedTextElem.textContent = text;
+            // 옵션을 선택한 후에만 파란 박스를 보이도록 함
+            selectedTextElem.style.display = 'block';
+        }
+
+        // 필터링, 합계 계산 및 상위 3개 열 추출 후 결과 출력 함수
+        function filterAndDisplay() {
+            // 먼저, 각 카테고리별 선택된 옵션들을 수집합니다.
+            let selectedOptionsByCategory = {}; // {category: [option, ...], ...}
+            categories.forEach(cat => {
+                // 해당 카테고리의 체크박스 중 체크된 것만 추출
+                let checkboxes = document.getElementsByName(cat);
+                selectedOptionsByCategory[cat] = [];
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedOptionsByCategory[cat].push(checkbox.value);
+                    }
+                });
+            });
+            // 선택된 옵션들을 텍스트로 표시
+            displaySelectedOptionsText(selectedOptionsByCategory);
+            
+            // 필터링: 각 행에 대해, 해당 행의 A열(카테고리)와 B열(옵션)을 확인하여,
+            // 해당 카테고리에서 선택된 옵션이 있다면 그 옵션에 해당하는 행만 포함합니다.
+            let filteredRows = dataRows.filter(row => {
+                let cat = row[0];
+                let opt = row[1];
+                // 만약 해당 카테고리에서 선택된 옵션이 없으면(전체 선택), 필터 제한 없음
+                if (!selectedOptionsByCategory[cat] || selectedOptionsByCategory[cat].length === 0) {
+                    return true;
+                } else {
+                    // 선택된 옵션이 있다면, 행의 옵션이 그 중 하나에 해당해야 함
+                    return selectedOptionsByCategory[cat].includes(opt);
+                }
+            });
+
+            // 필터링된 데이터 테이블 생성 (헤더 포함)
+            let html = '<table><thead><tr>';
+            header.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            filteredRows.forEach(row => {
+                html += '<tr>';
+                row.forEach(cell => {
+                    html += `<td>${cell !== undefined ? cell : ""}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            // 합계 계산: C열부터 Y열 (인덱스 2 ~ 24, 총 23개 열)
+            let sums = new Array(23).fill(0);
+            filteredRows.forEach(row => {
+                for (let i = 0; i < 23; i++) {
+                    let val = parseFloat(row[2 + i]);
+                    if (!isNaN(val)) {
+                        sums[i] += val;
+                    }
+                }
+            });
+            
+            // 합계 행 추가 (A열: "합계", B열: 공백, 나머지 열에 합계 출력)
+            html += '<tr>';
+            html += `<td>합계</td><td></td>`;
+            sums.forEach(sumVal => {
+                html += `<td>${sumVal}</td>`;
+            });
+            html += '</tr>';
+            html += '</tbody></table>';
+            document.getElementById('filteredTableContainer').innerHTML = html;
+            
+            // 상위 3개 열 추출: 합계 배열에서 가장 큰 값 상위 3개 항목
+            let sumObjects = sums.map((sum, index) => {
+                const colIndex = 2 + index; // 실제 열 헤더 (C열부터 시작)
+                return {
+                    sum: sum,
+                    colName: header[colIndex] ? header[colIndex] : String.fromCharCode(67 + index)
+                };
+            });
+            sumObjects.sort((a, b) => b.sum - a.sum);
+            let top3 = sumObjects.slice(0, 3);
+            
+            // 상위 3개 위험요소 정보 표시 (글씨 크게)
+            let topHtml = '<h2>해당 제품/서비스의 경우 가장 위험요소가 큰 3개는 다음과 같습니다</h2><ul>';
+            top3.forEach(item => {
+                topHtml += `<li>${item.colName} (합계: ${item.sum})</li>`;
+            });
+            topHtml += '</ul>';
+            document.getElementById('topColumnsContainer').innerHTML = topHtml;
+        }
+    </script>
+</body>
+</html>

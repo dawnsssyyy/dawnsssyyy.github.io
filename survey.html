@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Risk Framework (Paginated)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+      line-height: 1.6;
+    }
+    /* 페이지 하나하나를 구분 */
+    /* 페이지 기본 스타일 */
+.page {
+  display: none; /* 기본적으로 숨김 */
+  margin: 20px 0;
+}
+
+/* 페이지 내 제목 색상 */
+.page h1,
+.page h2,
+.page h3 {
+  color: #4CAF50;
+}
+
+/* 내비게이션 스타일 (가운데 정렬) */
+.navigation {
+  text-align: center;
+  margin-top: 30px;
+}
+.navigation a {
+  font-size: 18px;
+  color: #4CAF50;
+  text-decoration: none;
+  cursor: pointer;
+}
+.navigation a:hover {
+  text-decoration: underline;
+}
+
+/* 연구 제목 */
+.research-title {
+  font-size: 2rem;    /* 크게 */
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* 콘텐츠 박스 */
+.content-box {
+  border: 2px solid #4CAF50;
+  background-color: #fff;
+  padding: 20px;
+  font-size: 18px;
+  line-height: 1.8;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* 강조 텍스트 */
+.highlight {
+  font-size: 20px;    /* 강조할 문장은 더 크고 굵게 */
+  font-weight: bold;
+  color: #000;
+}
+
+/* 소개 텍스트 */
+.intro-text {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+/* 단계 목록 스타일 */
+.steps-list {
+  font-size: 18px;
+  line-height: 1.8;
+  padding-left: 20px;
+  margin: 20px 0;
+}
+
+/* 단계별 설명 박스 (uniform style) */
+.step-box {
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+/* 각 단계 제목 */
+.step-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* 단계 설명 */
+.step-desc {
+  font-size: 18px;
+  color: #555;
+}
+
+/* 위험 테이블 스타일 */
+.risk-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.risk-table th,
+.risk-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  font-size: 18px;
+}
+.risk-table th {
+  background-color: #4CAF50;
+  color: #fff;
+  font-size: 20px;
+}
+
+/* 시나리오 설명 박스 */
+.scenario-box {
+  background-color: #fff;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 18px;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+/* 다음 링크 스타일 */
+.next-link {
+  font-size: 18px;
+  color: #4CAF50;
+  text-decoration: none;
+  cursor: pointer;
+}
+.next-link:hover {
+  text-decoration: underline;
+}
+
+
+
+}
+  </style>
+
+  <script>
+    let currentPage = 0;
+
+    // 특정 페이지(index)만 보이게 하고, 나머지는 숨김
+    function showPage(pageIndex) {
+      const pages = document.getElementsByClassName('page');
+      for (let i = 0; i < pages.length; i++) {
+        pages[i].style.display = 'none';
+      }
+      if (pages[pageIndex]) {
+        pages[pageIndex].style.display = 'block';
+        currentPage = pageIndex;
+      }
+    }
+    // "[다음]" 버튼 클릭 시 다음 페이지로 이동
+    function nextPage() {
+      const pages = document.getElementsByClassName('page');
+      if (currentPage < pages.length - 1) {
+        showPage(currentPage + 1);
+      }
+    }
+
+    window.onload = function() {
+      // 페이지가 로드되면 첫 번째 페이지부터 보여줌
+      showPage(0);
+    }
+  </script>
+</head>
+<body>
+  <!-- 
+    예시로, PDF에 등장하는 '[다음]' 문구를 기준으로
+    여러 <div class="page">로 나누었습니다.
+    실제로는 PDF 전체 텍스트를 필요한 만큼 잘라 넣으시면 됩니다.
+  -->
+
+<!-- 페이지 1 (PDF의 첫 부분부터 첫 [다음] 전까지) -->
+<div class="page">
+  <h2>AI Risk Framework 이용자 설문조사</h2>
+  
+  <!-- 본 연구 목적 제목: 더 크게, 굵게 -->
+  <h1 class="research-title">본 연구 목적</h1>
+  
+  <!-- 본문 내용을 박스 형태로 감싸고, 글씨 크기 및 간격을 키움 -->
+  <div class="content-box">
+    <p>
+      인공지능이 빠르게 발전하면서 그로 인한 위험도 증가하고 있습니다. 예를 들어, 인공지능은 허위 정보 생성, 개인정보 침해, 독성 콘텐츠 노출, 편향된 결과 등으로 다양한 위험을 유발합니다.<br><br>
+      인공지능 제품/서비스를 개발할 때는 인공지능의 잠재적인 위험을 반드시 인식해야 합니다. 인공지능 위험을 인지하고 이를 최소화하기 위한 노력을 해야 사용자와 사회에 대한 피해를 줄일 수 있고, 제품/서비스 출시 이후에도 책임있는 관리와 신속한 문제 해결이 가능합니다. 그렇지 않을 경우 여러 법적 책임을 지게 되거나 제품/서비스 출시가 중단될 수 있습니다.<br><br>
+      하지만 각 인공지능 제품/서비스가 유발하는 위험은 무엇인지, 그 중 중요한 위험인지 파악하는 것은 쉽지 않습니다. 인공지능이 유발하는 위험의 종류가 많고 다양하여, 인공지능 제품/서비스 준비 과정에서 모든 위험을 한꺼번에 다루기는 쉽지 않습니다.<br><br>
+      따라서 인공지능 제품/서비스 특성에 따라 가장 심각하고 즉각적인 영향을 미칠 수 있는 위험부터 관리할 수 있도록 제시해주는 프레임워크가 필요합니다. 이에 우리는 제품/서비스 특성에 따라 인공지능 위험의 우선순위를 정해 보여주는 AI Risk Framework를 개발하였습니다.<br><br>
+      <span class="highlight">본 프레임워크는 ‘기사’를 활용하여 ‘제품/서비스별 AI 위험’의 발생 빈도와 위해성을 측정하여 ‘우선순위별’로 제공합니다.</span><br><br>
+      최근 기사를 기반으로 인공지능 제품/서비스 특성에 따라 위험이 발생한 빈도와 위해성을 수치화하고, 이를 기반으로 순위를 도출함으로써 실무자가 효과적이고 직관적으로 위험을 식별하고 관리할 수 있도록 돕습니다.
+    </p>
+  </div>
+  
+  <!-- 하단 네비게이션: 가운데 정렬, 단순 "[다음]" 텍스트 링크 -->
+  <div class="navigation">
+    <a class="next-link" onclick="nextPage()">[다음]</a>
+  </div>
+</div>
+
+
+  <!-- 페이지 2 (두 번째 [다음] 전까지) -->
+  <div class="page">
+    <h2>🚩 AI Risk Framework 구축</h2>
+    <p class="intro-text">우리의 AI Risk Framework는 다음과 같이 구축되었습니다.</p>
+
+    <ol class="steps-list">
+      <li class="step-box">
+        <h3 class="step-title">1) 제품 및 서비스를 7개 특성으로 유형화</h3>
+        <p class="step-desc">
+          <strong>특성:</strong> (1) 적용 분야, (2) 의사결정 지원의 중요도, (3) 데이터 민감도, (4) 시스템의 설명가능성, (5) 의사결정 자동화 수준, (6) 사용대상, (7) 기술적 특징
+        </p>
+      </li>
+      <li class="step-box">
+        <h3 class="step-title">2) 기사 분석 및 위험 측정</h3>
+        <p class="step-desc">
+          일정 기간 동안 인공지능 위험 관련 기사를 크롤링한 후, 해당 기사 내용을 바탕으로 제품/서비스 특성과 위험 요소 간의 동시 등장 빈도(likelihood)와 피해 정도(Severity)를 정량적으로 계산합니다. 이는 bottom-up 방식으로, 일반인이 인지하는 위험에 근거합니다.
+        </p>
+      </li>
+      <li class="step-box">
+        <h3 class="step-title">3) AI Risk Framework Table 완성</h3>
+        <p class="step-desc">
+          이 테이블에서 각 위험 요소와 제품/서비스 특성 사이의 수치는 ‘위험의 정도’를 나타냅니다.<br>
+          <span class="highlight">
+            예: 기술적으로 ‘D29 인식’ 특징이 있을 때, ‘부당한 차별과 허위진술 위험(R1)’이 약 2 정도로 나타납니다.
+          </span><br>
+          위험 요소 합산 값이 클수록 해당 위험은 더 중요하게 고려되어야 합니다.
+        </p>
+      </li>
+      <li class="step-box">
+        <h3 class="step-title">4) AI Risk Framework Table 활용</h3>
+        <p class="step-desc">
+          제품/서비스의 특성을 선택하면, 위험 요소별 합산값을 통해 중요한 AI 위험을 파악할 수 있습니다. (같은 행에서 합산 값이 클수록 더 중요한 위험으로 간주됩니다.)
+        </p>
+      </li>
+    </ol>
+
+    <div class="navigation">
+      <a class="next-link" onclick="nextPage()">[다음]</a>
+    </div>
+  </div>
+
+  <!-- 페이지 3 (세 번째 [다음] 전까지) -->
+  <div class="page">
+    <h2>실험에 대한 설명</h2>
+    <p>
+      세 개의 AI 제품/서비스 시나리오에 대해서<br>
+      (1) AI Risk Framework를 이용해 위험요소를 찾아보고<br>
+      (2) 상위 위험요소 3개에 대해서 추가적인 설명을 제공합니다.
+    </p>
+    <p>이제 본격적으로 시나리오를 보여드리겠습니다...</p>
+    <!-- ...이후 내용... -->
+    <div class="navigation">
+      <a onclick="nextPage()">[다음]</a>
+    </div>
+  </div>
+
+    <!-- 페이지 4  -->
+  <!-- 페이지 2 (두 번째 [다음] 전까지) -->
+<div class="page">
+  <h2>🚩 AI Risk Framework 구축</h2>
+  
+  <!-- 시나리오 설명 박스 -->
+  <div class="scenario-box">
+    <p>
+      금융 및 보험회사 "스마트보험"은 AI 기반의 개인 맞춤형 보험 추천 및 리스크 관리 시스템을 구축했습니다. 이 시스템은 고객의 재정 상태, 생활 습관, 건강 정보와 같이 민감하고 개인적인 데이터를 바탕으로 보험 가입 여부 및 가입 조건을 추천합니다.
+    </p>
+    <p>
+      AI는 머신러닝과 지식구조를 활용하여 고객별로 미래의 리스크를 정확하게 예측하며, 고객에게 가장 적합한 보험상품을 제안합니다. 시스템은 고객의 <strong>건강 상태, 재정 상황, 직업군 등의 민감한 정보를 종합적으로 분석</strong>하여 <strong>생명, 안전, 기본권 등 중요한 인간 권리에 영향을 줄 수 있는 핵심 의사결정을 지원</strong>합니다.
+    </p>
+    <p>
+      이러한 AI 시스템은 <strong>설명 가능한 인터페이스를 제공</strong>하여 고객 및 감독 기관이 의사결정 이유와 과정을 이해할 수 있도록 돕습니다. 모델이 복잡하더라도 별도의 설명 인터페이스와 사후 분석을 통해 공정성과 투명성을 검증합니다.
+    </p>
+    <p>
+      또한, AI 시스템은 높은 자동화 수준으로 운영되지만, <strong>사람은 의사결정을 모니터링하며 필요시 즉각 개입하는 중간 자율도</strong>를 유지하여, 과도한 불리한 조건이 제시될 경우 공정성을 보장합니다.
+    </p>
+  </div>
+
+  <!-- 단계별 설명 박스 1: 특성 선택 -->
+  <div class="step-box">
+    <h3>1️⃣ 위 시스템의 특성을 선택합니다.</h3>
+    <ul class="step-list">
+      <li>금융·보험업에 적용된다.</li>
+      <li>핵심적 의사결정을 지원한다.</li>
+      <li>민감한 정보를 사용한다.</li>
+      <li>설명 인터페이스를 포함한다.</li>
+      <li>인간이 모니터링하며 필요시 개입한다.</li>
+      <li>개인화, 예측, 지식구조를 위한 추론 기술을 사용한다.</li>
+    </ul>
+  </div>
+
+  <!-- 단계별 설명 박스 2: 위험 점수 상위 3개 -->
+  <div class="step-box">
+    <h3>2️⃣ 위험 점수가 높은 Risk 상위 3개</h3>
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>순위</th>
+          <th>위험</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>R22: 투명성이나 해석 가능성 부족</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>R6: 허위 또는 오해의 소지가 있는 정보</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>R8: 허위 정보, 감시 및 대규모 영향력</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 하단 네비게이션 (중앙정렬된 "[다음]" 링크) -->
+  <div class="navigation">
+    <a class="next-link" onclick="nextPage()">[다음]</a>
+  </div>
+</div>
+
+  <!-- ...중략: 나머지 페이지들... -->
+
+  <!-- 마지막 페이지 예시 (마지막 [다음] 바로 뒤 내용) -->
+  <div class="page">
+    <h2>설문조사 & 마무리</h2>
+    <p>
+      응답자에 대한 설문조사입니다.<br>
+      <a href="https://naver.me/IDFlTUFK" target="_blank">https://naver.me/IDFlTUFK</a>
+    </p>
+    <p>
+      이용 경험에 대한 설문조사입니다.<br>
+      <a href="https://naver.me/5jJL8tXW" target="_blank">https://naver.me/5jJL8tXW</a>
+    </p>
+    <p>모두 마치셨습니다. 감사합니다.</p>
+    <!-- 마지막 페이지는 더 이상 다음 버튼이 필요 없을 수도 있음 -->
+  </div>
+</body>
+</html>
