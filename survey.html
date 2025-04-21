@@ -147,20 +147,11 @@
   margin-bottom: 1em;
 }
 .video-container {
-  position: relative;
-  width: 100%;
-  max-width: 1000px;      /* 원하시는 최대 너비로 조절 */
-  height: 0;
-  overflow: hidden;
-  margin: 20px auto;     /* 위·아래 여백 20px, 중앙 정렬 */
+  max-width: 600px;    /* 원하는 최대너비 */
+  margin: 20px auto;   /* 위아래 여백, 중앙정렬 */
 }
-
-.video-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;           /* 컨테이너 너비에 맞춤 */
-  height: 100%;          /* 높이 자동 조절 */
+.video-container video {
+  display: block;
 }
 
 </style>
@@ -205,7 +196,7 @@
   <h2>AI Risk Framework 이용자 설문조사</h2>
   
   <!-- 본 연구 목적 제목: 더 크게, 굵게 -->
-  <h2>본 연구 목적11</h2>
+  <h2>본 연구 목적</h2>
  
   <!-- 본문 내용을 박스 형태로 감싸고, 글씨 크기 및 간격을 키움 -->
   <div class="content-box">
@@ -322,14 +313,12 @@
       <li>인간이 모니터링하며 필요시 개입한다.</li>
       <li>개인화, 예측, 지식구조를 위한 추론 기술을 사용한다.</li>
     </ul>
-    <div class="video-container">
-    <iframe
-      src="https://drive.google.com/file/d/1T7FJHiUZW9e8AXS4fOq2Q9cxw5lnFjBc/preview"
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-      allowfullscreen>
-     </iframe>
-     </div>
+      <!-- 동일 폴더 내 scenario_1.mp4 비디오 삽입 -->
+  	<div class="video-container">
+    		<video controls width="100%" height="auto">
+      		<source src="scenario_1.mp4" type="video/mp4">
+    		</video>
+  	</div>
   </div>
 
   <!-- 단계별 설명 박스 2: 위험 점수가 높은 상위 3개 위험은 다음과 같습니다. -->
